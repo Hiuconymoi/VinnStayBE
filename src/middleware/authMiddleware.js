@@ -20,3 +20,21 @@ export const verifyToken = async (req, res, next) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
+// Check role
+export const authorize = (roles = []) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role_id) {
+      return res.status(403).json({ message: "Forbidden - No role assigned" });
+    }
+
+    // 🔹 Check role by role name
+    const userRole = req.user.role_id.name;
+    if (!roles.includes(userRole)) {
+      return res.status(403).json({ message: "Forbidden - Insufficient role" });
+    }
+
+    next();
+  };
+};
+
