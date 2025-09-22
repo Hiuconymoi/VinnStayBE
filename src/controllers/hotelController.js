@@ -8,7 +8,14 @@ exports.createHotel = async (req, res) => {
       return res.status(403).json({ message: "Only hotel owners or admin can create hotels" });
     }
 
-    const hotel = await Hotel.create({ ...req.body, owner_id: req.user.id });
+    const imageUrls = req.files ? req.files.map((file) => file.path) : [];
+
+    const hotel = await Hotel.create({
+      ...req.body,
+      owner_id: req.user.id,
+      images: imageUrls, // thêm ảnh
+    });
+
     res.status(201).json(hotel);
   } catch (error) {
     res.status(500).json({ message: "Error creating hotel", error: error.message });
@@ -46,8 +53,14 @@ exports.updateHotel = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to update this hotel" });
     }
 
+    if (req.files && req.files.length > 0) {
+      const imageUrls = req.files.map((file) => file.path);
+      hotel.images.push(...imageUrls); // append thêm ảnh
+    }
+
     Object.assign(hotel, req.body);
     await hotel.save();
+
     res.json(hotel);
   } catch (error) {
     res.status(500).json({ message: "Error updating hotel", error: error.message });

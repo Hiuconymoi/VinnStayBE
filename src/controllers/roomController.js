@@ -11,7 +11,13 @@ exports.createRoom = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to add room to this hotel" });
     }
 
-    const room = await Room.create(req.body);
+    const imageUrls = req.files ? req.files.map((file) => file.path) : [];
+
+    const room = await Room.create({
+      ...req.body,
+      images: imageUrls, // thêm ảnh
+    });
+
     res.status(201).json(room);
   } catch (error) {
     res.status(500).json({ message: "Error creating room", error: error.message });
@@ -49,8 +55,14 @@ exports.updateRoom = async (req, res) => {
       return res.status(403).json({ message: "Not authorized to update this room" });
     }
 
+    if (req.files && req.files.length > 0) {
+      const imageUrls = req.files.map((file) => file.path);
+      room.images.push(...imageUrls); // append thêm ảnh
+    }
+
     Object.assign(room, req.body);
     await room.save();
+
     res.json(room);
   } catch (error) {
     res.status(500).json({ message: "Error updating room", error: error.message });

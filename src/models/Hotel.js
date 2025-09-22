@@ -14,6 +14,8 @@ const hotelSchema = new mongoose.Schema(
     check_in_time: { type: String },
     check_out_time: { type: String },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
+
+    images: [{ type: String }] 
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
