@@ -24,6 +24,17 @@ exports.createRoom = async (req, res) => {
   }
 };
 
+// Lấy tất cả phòng
+exports.getRooms = async (req, res) => {
+  try {
+    const rooms = await Room.find().populate("hotel_id", "name city");
+    res.json(rooms);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching rooms", error: error.message });
+  }
+};
+
+
 // Lấy tất cả phòng của khách sạn
 exports.getRoomsByHotel = async (req, res) => {
   try {
