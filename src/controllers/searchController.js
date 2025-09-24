@@ -28,3 +28,30 @@ exports.searchRooms = async (req, res) => {
     res.status(500).json({ message: "Error searching rooms", error: error.message });
   }
 };
+
+
+// Search hotels
+exports.searchHotels = async (req, res) => {
+  try {
+    const { city, country, minRating, maxRating, status, name } = req.query;
+
+    let query = {};
+
+    if (city) query.city = new RegExp(city, "i"); // không phân biệt hoa thường
+    if (country) query.country = new RegExp(country, "i");
+    if (status) query.status = status;
+    if (name) query.name = new RegExp(name, "i");
+
+    if (minRating || maxRating) {
+      query.rating = {};
+      if (minRating) query.rating.$gte = Number(minRating);
+      if (maxRating) query.rating.$lte = Number(maxRating);
+    }
+
+    const hotels = await Hotel.find(query).populate("owner_id", "username email");
+
+    res.json(hotels);
+  } catch (error) {
+    res.status(500).json({ message: "Error searching hotels", error: error.message });
+  }
+};

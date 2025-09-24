@@ -32,6 +32,27 @@ exports.getHotels = async (req, res) => {
   }
 };
 
+exports.getHotelsByOwner = async (req, res) => {
+  try {
+    // check role
+    if (req.user.role !== "hotel_owner" && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only hotel owners or admin can view their hotels" });
+    }
+
+    const ownerId = req.params.ownerId;
+
+    const hotels = await Hotel.find({ owner_id: ownerId }).populate("owner_id", "username email");
+
+    if (hotels.length === 0) {
+      return res.status(404).json({ message: "No hotels found for this owner" });
+    }
+
+    res.json(hotels);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching owner's hotels", error: error.message });
+  }
+};
+
 // Lấy khách sạn theo id
 exports.getHotelById = async (req, res) => {
   try {

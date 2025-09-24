@@ -10,4 +10,6 @@ router.get("/:id", hotelController.getHotelById);
 router.put("/:id", verifyToken,upload.array("images", 5), hotelController.updateHotel);
 router.delete("/:id", verifyToken, hotelController.deleteHotel);
 
+router.get("/owner/:ownerId", verifyToken, hotelController.getHotelsByOwner);
+
 module.exports = router;
