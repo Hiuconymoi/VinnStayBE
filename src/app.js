@@ -23,6 +23,7 @@ app.use('/api/roles', require('./routes/roleRoutes'));
 app.use("/api/hotels", require("./routes/hotelRoutes"));
 app.use("/api/rooms", require("./routes/roomRoutes"));
 app.use("/api/search", require("./routes/searchRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
 
 
 // 404

@@ -15,6 +15,7 @@ exports.createRoom = async (req, res) => {
 
     const room = await Room.create({
       ...req.body,
+      is_available: true, // mặc định phòng mới là available
       images: imageUrls, // thêm ảnh
     });
 
