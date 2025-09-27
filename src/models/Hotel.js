@@ -11,11 +11,10 @@ const hotelSchema = new mongoose.Schema(
     latitude: { type: Number },
     longitude: { type: Number },
     rating: { type: Number, default: 0 },
-    check_in_time: { type: String },
-    check_out_time: { type: String },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
 
-    images: [{ type: String }] 
+    images: [{ type: String }],
+    amenities: [{ type: String }],
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );

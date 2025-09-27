@@ -15,8 +15,8 @@ exports.createRoom = async (req, res) => {
 
     const room = await Room.create({
       ...req.body,
-      is_available: true, // mặc định phòng mới là available
-      images: imageUrls, // thêm ảnh
+      is_available: true,
+      images: imageUrls,
     });
 
     res.status(201).json(room);
@@ -69,7 +69,7 @@ exports.updateRoom = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       const imageUrls = req.files.map((file) => file.path);
-      room.images.push(...imageUrls); // append thêm ảnh
+      room.images.push(...imageUrls);
     }
 
     Object.assign(room, req.body);

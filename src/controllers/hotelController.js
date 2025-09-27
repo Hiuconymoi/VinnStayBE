@@ -13,7 +13,8 @@ exports.createHotel = async (req, res) => {
     const hotel = await Hotel.create({
       ...req.body,
       owner_id: req.user.id,
-      images: imageUrls, // thêm ảnh
+      images: imageUrls,
+      amenities: req.body.amenities || [] 
     });
 
     res.status(201).json(hotel);
@@ -70,19 +71,31 @@ exports.updateHotel = async (req, res) => {
     const hotel = await Hotel.findById(req.params.id);
     if (!hotel) return res.status(404).json({ message: "Hotel not found" });
 
+    // kiểm tra quyền
     if (req.user.role !== "admin" && hotel.owner_id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not authorized to update this hotel" });
     }
 
+    // Nếu có upload thêm ảnh thì append vào images
     if (req.files && req.files.length > 0) {
       const imageUrls = req.files.map((file) => file.path);
-      hotel.images.push(...imageUrls); // append thêm ảnh
+      hotel.images.push(...imageUrls);
     }
 
-    Object.assign(hotel, req.body);
+    // Nếu có truyền amenities thì cập nhật (ghi đè bằng mảng mới)
+    if (req.body.amenities) {
+      hotel.amenities = Array.isArray(req.body.amenities)
+        ? req.body.amenities
+        : [req.body.amenities]; 
+    }
+
+    // Update các field khác trừ images & amenities
+    const { amenities, images, ...updateFields } = req.body;
+    Object.assign(hotel, updateFields);
+
     await hotel.save();
 
-    res.json(hotel);
+    res.json({ message: "Hotel updated successfully", hotel });
   } catch (error) {
     res.status(500).json({ message: "Error updating hotel", error: error.message });
   }

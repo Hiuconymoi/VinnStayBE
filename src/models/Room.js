@@ -11,6 +11,11 @@ const roomSchema = new mongoose.Schema(
     description: { type: String },
     amenities: [{ type: String }],
 
+    view: { type: String }, 
+    room_area: { type: Number }, 
+    check_in: { type: String }, 
+    check_out: { type: String }, 
+
     images: [{ type: String }]
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
