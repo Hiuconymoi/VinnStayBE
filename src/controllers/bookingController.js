@@ -130,7 +130,8 @@ exports.getOwnerBookings = async (req, res) => {
     // Lấy booking thuộc các hotel này
     const bookings = await Booking.find({ hotel_id: { $in: hotelIds } })
       .populate("room_id")
-      .populate("hotel_id");
+      .populate("hotel_id")
+      .populate("user_id", "username email");
 
     res.json({ message: "Owner bookings fetched successfully", bookings });
   } catch (error) {
