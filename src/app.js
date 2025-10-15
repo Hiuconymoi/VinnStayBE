@@ -25,6 +25,8 @@ app.use("/api/rooms", require("./routes/roomRoutes"));
 app.use("/api/search", require("./routes/searchRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
 
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/notifications", require("./routes/notificationRoutes"));
 
 // 404
 app.use((req, res, next) => {
