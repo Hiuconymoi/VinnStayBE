@@ -32,13 +32,24 @@ exports.createReview = async (req, res) => {
       message: `Your hotel "${hotel.name}" just got a new review (${rating}★) with comment "${comment}".`,
     });
 
-    if (req.io) {
-      req.io.to(hotel.owner_id._id.toString()).emit("newNotification", notification);
+    const io = req.app.get("io");
+    if (io) {
+      io.to(String(hotel.owner_id._id)).emit("notification:new", {
+        notification: {
+          _id: notification._id,
+          title: notification.title,
+          message: notification.message,
+          created_at: notification.created_at || new Date().toISOString(),
+          type: "review:created",
+        },
+      });
     }
 
     res.status(201).json({ message: "Review created successfully", review });
   } catch (error) {
-    res.status(500).json({ message: "Error creating review", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating review", error: error.message });
   }
 };
 
@@ -68,8 +79,13 @@ exports.editReview = async (req, res) => {
     if (!review) return res.status(404).json({ message: "Review not found" });
 
     // Chỉ người viết hoặc admin mới được sửa
-    if (req.user.role !== "admin" && review.user_id.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to edit this review" });
+    if (
+      req.user.role !== "admin" &&
+      review.user_id.toString() !== req.user.id
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to edit this review" });
     }
 
     // Cập nhật nội dung
@@ -81,11 +97,15 @@ exports.editReview = async (req, res) => {
     const reviews = await Review.find({ hotel_id: review.hotel_id });
     const avgRating =
       reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-    await Hotel.findByIdAndUpdate(review.hotel_id, { rating: avgRating.toFixed(1) });
+    await Hotel.findByIdAndUpdate(review.hotel_id, {
+      rating: avgRating.toFixed(1),
+    });
 
     res.json({ message: "Review updated successfully", review });
   } catch (error) {
-    res.status(500).json({ message: "Error updating review", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating review", error: error.message });
   }
 };
 
@@ -98,8 +118,13 @@ exports.deleteReview = async (req, res) => {
     if (!review) return res.status(404).json({ message: "Review not found" });
 
     // Chỉ người viết hoặc admin mới được xóa
-    if (req.user.role !== "admin" && review.user_id.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized to delete this review" });
+    if (
+      req.user.role !== "admin" &&
+      review.user_id.toString() !== req.user.id
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this review" });
     }
 
     await review.deleteOne();
@@ -110,10 +135,14 @@ exports.deleteReview = async (req, res) => {
       reviews.length > 0
         ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
         : 0;
-    await Hotel.findByIdAndUpdate(review.hotel_id, { rating: avgRating.toFixed(1) });
+    await Hotel.findByIdAndUpdate(review.hotel_id, {
+      rating: avgRating.toFixed(1),
+    });
 
     res.json({ message: "Review deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting review", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting review", error: error.message });
   }
 };
